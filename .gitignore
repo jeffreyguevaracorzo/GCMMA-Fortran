@@ -1,0 +1,2 @@
+$ ignore .mod file generated in the compilation
+*.mod
