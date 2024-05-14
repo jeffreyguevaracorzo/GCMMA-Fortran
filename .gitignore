@@ -1,2 +1,4 @@
-$ ignore .mod file generated in the compilation
+# ignore .mod file generated in the compilation
 *.mod
+*.o
+Execute
