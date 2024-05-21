@@ -48,33 +48,34 @@ program Example
         outvector1 = [real(outeriter),real(innerit), xval]
         outvector2 = [f0val, fval]
     end if
-    kktnorm = kkttol + 10
-    outit = 0        
 
     ! The outer iterations start
+    kktnorm = kkttol + 10
+    outit = 0        
     do while ((kktnorm.gt.kkttol).and.(outit.lt.maxoutit))
         ! counter
         outit = outit + 1
         outeriter = outeriter + 1
         ! The parameters low, upp, raa0 and raa are calculated
-        call Asymp(low,upp,raa0,raa,outeriter,n,xval,xold1,xold2,xmin,xmax,raa0eps,raaeps,df0dx,dfdx)
+        call Asymp(low,upp,raa0,raa,outeriter,n,xval,xold1,xold2,xmin,xmax,raa0eps, &
+                    raaeps,df0dx,dfdx)
         ! The GCMMA subproblem is solved at the point xval
         call GCMMA_Sub(xmma,ymma,zmma,lam,xsi,eta,mu,zet,s,low,upp,m,n,outeriter,xval, &                                
-                     xmin,xmax,xold1,xold2,f0val,df0dx,fval,dfdx,a0,a,c,d)
+                        xmin,xmax,xold1,xold2,f0val,df0dx,fval,dfdx,a0,a,c,d)
         call ObjectiveFunction(xmma,f0valnew,df0dx,fvalnew,dfdx)
         ! It is checked if the approximations are conservative
         call Concheck(conserv,m,epsimin,f0app,f0valnew,fapp,fvalnew)
         
         ! While the approximations are non-conservative (conserv=0)
         innerit = 0
-        if ( conserv.eq.0 ) then
-            do while ( (conserv.eq.0).and.(innerit.le.15) )
+        if (conserv.eq.0) then
+            do while ((conserv.eq.0).and.(innerit.le.15))
                 innerit = innerit + 1
                 ! New values on the parameters raa0 and raa are calculated
                 call raaUpdate()
                 ! The GCMMA subproblem is solved with these new raa0 and raa
                 call GCMMA_Sub(xmma,ymma,zmma,lam,xsi,eta,mu,zet,s,low,upp,m,n,outeriter,xval, &                                
-                     xmin,xmax,xold1,xold2,f0val,df0dx,fval,dfdx,a0,a,c,d)
+                                xmin,xmax,xold1,xold2,f0val,df0dx,fval,dfdx,a0,a,c,d)
                 call ObjectiveFunction(xmma,f0valnew,df0dx,fvalnew,dfdx)
                 ! It is checked if the approximations have become conservative
                 call Concheck(conserv,m,epsimin,f0app,f0valnew,fapp,fvalnew)
@@ -88,7 +89,7 @@ program Example
         call ObjectiveFunction(xval,f0val,df0dx,fval,dfdx)
         ! Residual vector of KKT conditions
         call kktcheck(residu,kktnorm,residumax,xmma,ymma,zmma,lam,xsi,eta, &
-                      mu,zet,s,xmin,xmax,df0dx,fval,dfdx,a0,a,c,d)
+                        mu,zet,s,xmin,xmax,df0dx,fval,dfdx,a0,a,c,d)
         outvector1 = [real(outeriter), xval(:,1)]
         outvector2 = [f0val, fval(:,1)]
     end do
