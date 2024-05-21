@@ -1,5 +1,5 @@
 module GCMMA_Routines
-  implicit none
+    implicit none
     ! Base routines
     interface Zeros
         module procedure ZerosMatrix
@@ -36,12 +36,16 @@ module GCMMA_Routines
         module procedure KKTCheckDP
     end interface KKTCheck
     interface Concheck
-      module procedure ConcheckReal
-      module procedure ConcheckDP
+        module procedure ConcheckReal
+        module procedure ConcheckDP
     end interface Concheck
+    interface raaUpdate
+        module procedure raaUpdateReal
+        module procedure raaUpdateDP
+    end interface raaUpdate
     interface Asymp
-      module procedure AsympReal
-      module procedure AsympDP
+        module procedure AsympReal
+        module procedure AsympDP
     end interface Asymp
     
 contains
@@ -150,7 +154,7 @@ contains
 
     ! GCMMA Routine (pendiente)
     subroutine GCMMAsubReal(xmma,ymma,zmma,lam,xsi,eta,mu,zet,s,low,upp, &                                
-                     m,n,iter,xval,xmin,xmax,xold1,xold2,f0val,df0dx,fval,dfdx,a0,a,c,d)    
+                    m,n,iter,xval,xmin,xmax,xold1,xold2,f0val,df0dx,fval,dfdx,a0,a,c,d)    
         ! ------------------------------------------------------------------------------------- !
         ! This code is an adaptation in FORTRAN of the MMA algorithm presented in the Matlab    !
         ! programming language by Professor Svarberg.                                           !
@@ -360,7 +364,7 @@ contains
     end subroutine MMAsubReal
 
     subroutine GCMMAsubDP(xmma,ymma,zmma,lam,xsi,eta,mu,zet,s,low,upp, &                                
-                     m,n,iter,xval,xmin,xmax,xold1,xold2,f0val,df0dx,fval,dfdx,a0,a,c,d)    
+                        m,n,iter,xval,xmin,xmax,xold1,xold2,f0val,df0dx,fval,dfdx,a0,a,c,d)    
         ! ------------------------------------------------------------------------------------- !
         ! This code is an adaptation in FORTRAN of the MMA algorithm presented in the Matlab    !
         ! programming language by Professor Svarberg.                                           !
@@ -1467,186 +1471,326 @@ contains
 
     ! Concheck (pendiente)
     subroutine ConcheckReal(conserv,m,epsimin,f0app,f0valnew,fapp,fvalnew)
-      implicit none
-      integer, intent(inout)                              :: m
-      integer, intent(inout)                              :: conserv
-      real, intent(inout)                                 :: epsimin
-      real, intent(inout)                                 :: f0app
-      real, intent(inout)                                 :: f0valnew
-      real, dimension(:,:), allocatable, intent(inout)    :: fapp
-      real, dimension(:,:), allocatable, intent(inout)    :: fvalnew
-      real, dimension(:,:), allocatable                   :: eem
-      conserv = 0
-      eem = ones(m,1)
-      f0appe = f0app + epsimin;
-      fappe = fapp + epsimin*eeem
-      if ( all([f0appe,fappe(:,1)].ge.[f0appe,fvalnew(:,1)]) ) then
-        conserv = 1
-      end if
+        implicit none
+        integer, intent(inout)                              :: m
+        integer, intent(inout)                              :: conserv
+        real, intent(inout)                                 :: epsimin
+        real, intent(inout)                                 :: f0app
+        real, intent(inout)                                 :: f0valnew
+        real, dimension(:,:), allocatable, intent(inout)    :: fapp
+        real, dimension(:,:), allocatable, intent(inout)    :: fvalnew
+        real, dimension(:,:), allocatable                   :: eem
+        conserv = 0
+        eem = ones(m,1)
+        f0appe = f0app + epsimin;
+        fappe = fapp + epsimin*eeem
+        if ( all([f0appe,fappe(:,1)].ge.[f0appe,fvalnew(:,1)]) ) then
+            conserv = 1
+        end if
     end subroutine ConcheckReal
 
     subroutine ConcheckDP(conserv,m,epsimin,f0app,f0valnew,fapp,fvalnew)
-      implicit none
-      implicit none
-      integer, intent(inout)                                        :: m
-      integer, intent(inout)                                        :: conserv
-      double precision, intent(inout)                               :: epsimin
-      double precision, intent(inout)                               :: f0app
-      double precision, intent(inout)                               :: f0valnew
-      double precision, dimension(:,:), allocatable, intent(inout)  :: fapp
-      double precision, dimension(:,:), allocatable, intent(inout)  :: fvalnew
-      double precision, dimension(:,:), allocatable                 :: eem
-      conserv = 0
-      eem = ones(m,1)
-      f0appe = f0app + epsimin;
-      fappe = fapp + epsimin*eeem
-      if ( all([f0appe,fappe(:,1)].ge.[f0appe,fvalnew(:,1)]) ) then
-        conserv = 1
-      end if
+        implicit none
+        implicit none
+        integer, intent(inout)                                        :: m
+        integer, intent(inout)                                        :: conserv
+        double precision, intent(inout)                               :: epsimin
+        double precision, intent(inout)                               :: f0app
+        double precision, intent(inout)                               :: f0valnew
+        double precision, dimension(:,:), allocatable, intent(inout)  :: fapp
+        double precision, dimension(:,:), allocatable, intent(inout)  :: fvalnew
+        double precision, dimension(:,:), allocatable                 :: eem
+        conserv = 0
+        eem = ones(m,1)
+        f0appe = f0app + epsimin;
+        fappe = fapp + epsimin*eeem
+        if ( all([f0appe,fappe(:,1)].ge.[f0appe,fvalnew(:,1)]) ) then
+            conserv = 1
+        end if
     end subroutine ConcheckDP
 
     ! Asymp (pendiente)
     subroutine AsympReal(low,upp,raa0,raa,outeriter,n,xval,xold1,xold2,xmin,xmax,raa0eps,raaeps,df0dx,dfdx)
-      implicit none
-      integer, intent(inout)                            :: n
-      integer, intent(inout)                            :: outeriter
-      real, intent(inout)                               :: raa0
-      real, intent(inout)                               :: raa0eps                  
-      real, dimension(:), allocatable, intent(inout)    :: raa
-      real, dimension(:), allocatable, intent(inout)    :: raaeps
-      real, dimension(:,:), allocatable, intent(inout)  :: low
-      real, dimension(:,:), allocatable, intent(inout)  :: upp
-      real, dimension(:,:), allocatable, intent(inout)  :: xval
-      real, dimension(:,:), allocatable, intent(inout)  :: xold1
-      real, dimension(:,:), allocatable, intent(inout)  :: xold2
-      real, dimension(:,:), allocatable, intent(inout)  :: xmin
-      real, dimension(:,:), allocatable, intent(inout)  :: xmax
-      real, dimension(:,:), allocatable, intent(inout)  :: dfdx                      
-      real, dimension(:,:), allocatable, intent(inout)  :: df0dx                    
-      ! internal variables
-      real                                              :: asyinit
-      real                                              :: asyincr
-      real                                              :: asydecr
-      real, dimension(:,:), allocatable                 :: xmami
-      real, dimension(:,:), allocatable                 :: lowmin
-      real, dimension(:,:), allocatable                 :: lowmax
-      real, dimension(:,:), allocatable                 :: uppmin
-      real, dimension(:,:), allocatable                 :: uppmax
-      real, dimension(:,:), allocatable                 :: zzz
-      real, dimension(:,:), allocatable                 :: factor
-      real, dimension(:,:), allocatable                 :: eeen
-      real, dimension(:,:), allocatable                 :: xmamieps
-      eeen = ones(n,1)
-      xmami = xmax - xmin;
-      xmamieps = 0.00001*eeen
-      xmami = max(xmami,xmamieps)
-      raa0 = dot_product(abs(df0dx),xmami)
-      raa0 = maxval([raa0eps,(0.1/n)*raa0])
-      raa = matmul(abs(dfdx),xmami)
-      raa = max(raaeps,(0.1/n)*raa)
-      asyinit = 0.5       
-      asyincr = 1.2       
-      asydecr = 0.7
-      ! Calculation of the asymptotes low and upp
-      if (iter.lt.2.5) then
-          low = xval - asyinit*(xmami)
-          upp = xval + asyinit*(xmami)
-      else
-          zzz = (xval-xold1)*(xold1-xold2)
-          factor = eeen
-          where (zzz.gt.0.0)
-              factor = asyincr
-          elsewhere (zzz.lt.0.0)
-              factor = asydecr
-          end where
-          low = xval - factor*(xold1 - low)
-          upp = xval + factor*(upp - xold1)
-          lowmin = xval - 10.0*(xmami)
-          lowmax = xval - 0.01*(xmami)
-          uppmin = xval + 0.01*(xmami)
-          uppmax = xval + 10.0*(xmami)
-          low = max(low,lowmin)
-          low = min(low,lowmax)
-          upp = min(upp,uppmax)
-          upp = max(upp,uppmin)
-      end if
+        implicit none
+        integer, intent(inout)                            :: n
+        integer, intent(inout)                            :: outeriter
+        real, intent(inout)                               :: raa0
+        real, intent(inout)                               :: raa0eps                  
+        real, dimension(:,:), allocatable, intent(inout)  :: raa
+        real, dimension(:,:), allocatable, intent(inout)  :: raaeps
+        real, dimension(:,:), allocatable, intent(inout)  :: low
+        real, dimension(:,:), allocatable, intent(inout)  :: upp
+        real, dimension(:,:), allocatable, intent(inout)  :: xval
+        real, dimension(:,:), allocatable, intent(inout)  :: xold1
+        real, dimension(:,:), allocatable, intent(inout)  :: xold2
+        real, dimension(:,:), allocatable, intent(inout)  :: xmin
+        real, dimension(:,:), allocatable, intent(inout)  :: xmax
+        real, dimension(:,:), allocatable, intent(inout)  :: dfdx                      
+        real, dimension(:,:), allocatable, intent(inout)  :: df0dx                    
+        ! internal variables
+        real                                              :: asyinit
+        real                                              :: asyincr
+        real                                              :: asydecr
+        real, dimension(:,:), allocatable                 :: xmami
+        real, dimension(:,:), allocatable                 :: lowmin
+        real, dimension(:,:), allocatable                 :: lowmax
+        real, dimension(:,:), allocatable                 :: uppmin
+        real, dimension(:,:), allocatable                 :: uppmax
+        real, dimension(:,:), allocatable                 :: zzz
+        real, dimension(:,:), allocatable                 :: factor
+        real, dimension(:,:), allocatable                 :: eeen
+        real, dimension(:,:), allocatable                 :: xmamieps
+        eeen = ones(n,1)
+        xmami = xmax - xmin;
+        xmamieps = 0.00001*eeen
+        xmami = max(xmami,xmamieps)
+        raa0 = dot_product(abs(df0dx),xmami)
+        raa0 = maxval([raa0eps,(0.1/n)*raa0])
+        raa = matmul(abs(dfdx),xmami)
+        raa = max(raaeps,(0.1/n)*raa)
+        asyinit = 0.5       
+        asyincr = 1.2       
+        asydecr = 0.7
+        ! Calculation of the asymptotes low and upp
+        if (iter.lt.2.5) then
+            low = xval - asyinit*(xmami)
+            upp = xval + asyinit*(xmami)
+        else
+            zzz = (xval-xold1)*(xold1-xold2)
+            factor = eeen
+            where (zzz.gt.0.0)
+                factor = asyincr
+            elsewhere (zzz.lt.0.0)
+                factor = asydecr
+            end where
+            low = xval - factor*(xold1 - low)
+            upp = xval + factor*(upp - xold1)
+            lowmin = xval - 10.0*(xmami)
+            lowmax = xval - 0.01*(xmami)
+            uppmin = xval + 0.01*(xmami)
+            uppmax = xval + 10.0*(xmami)
+            low = max(low,lowmin)
+            low = min(low,lowmax)
+            upp = min(upp,uppmax)
+            upp = max(upp,uppmin)
+        end if
     end subroutine AsympReal
 
     subroutine AsympDP(low,upp,raa0,raa,outeriter,n,xval,xold1,xold2,xmin,xmax,raa0eps,raaeps,df0dx,dfdx)
-      implicit none
-      integer, intent(inout)                                        :: n
-      integer, intent(inout)                                        :: outeriter
-      double precision, intent(inout)                               :: raa0
-      double precision, intent(inout)                               :: raa0eps                  
-      double precision, dimension(:), allocatable, intent(inout)    :: raa
-      double precision, dimension(:), allocatable, intent(inout)    :: raaeps
-      double precision, dimension(:,:), allocatable, intent(inout)  :: low
-      double precision, dimension(:,:), allocatable, intent(inout)  :: upp
-      double precision, dimension(:,:), allocatable, intent(inout)  :: xval
-      double precision, dimension(:,:), allocatable, intent(inout)  :: xold1
-      double precision, dimension(:,:), allocatable, intent(inout)  :: xold2
-      double precision, dimension(:,:), allocatable, intent(inout)  :: xmin
-      double precision, dimension(:,:), allocatable, intent(inout)  :: xmax
-      double precision, dimension(:,:), allocatable, intent(inout)  :: dfdx                      
-      double precision, dimension(:,:), allocatable, intent(inout)  :: df0dx                    
-      ! internal variables
-      double precision                                              :: asyinit
-      double precision                                              :: asyincr
-      double precision                                              :: asydecr
-      double precision, dimension(:,:), allocatable                 :: xmami
-      double precision, dimension(:,:), allocatable                 :: lowmin
-      double precision, dimension(:,:), allocatable                 :: lowmax
-      double precision, dimension(:,:), allocatable                 :: uppmin
-      double precision, dimension(:,:), allocatable                 :: uppmax
-      double precision, dimension(:,:), allocatable                 :: zzz
-      double precision, dimension(:,:), allocatable                 :: factor
-      double precision, dimension(:,:), allocatable                 :: eeen
-      double precision, dimension(:,:), allocatable                 :: xmamieps
-      eeen = ones(n,1)
-      xmami = xmax - xmin;
-      xmamieps = 0.00001d0*eeen
-      xmami = max(xmami,xmamieps)
-      raa0 = dot_product(abs(df0dx),xmami)
-      raa0 = maxval([raa0eps,(0.1d0/n)*raa0])
-      raa = matmul(abs(dfdx),xmami)
-      raa = max(raaeps,(0.1d0/n)*raa)
-      asyinit = 0.5d0
-      asyincr = 1.2d0
-      asydecr = 0.7d0
-      ! Calculation of the asymptotes low and upp
-      if (iter.lt.2.5) then
-          low = xval - asyinit*(xmami)
-          upp = xval + asyinit*(xmami)
-      else
-          zzz = (xval-xold1)*(xold1-xold2)
-          factor = eeen
-          where (zzz.gt.0.0d0)
-              factor = asyincr
-          elsewhere (zzz.lt.0.0d0)
-              factor = asydecr
-          end where
-          low = xval - factor*(xold1 - low)
-          upp = xval + factor*(upp - xold1)
-          lowmin = xval - 10.0d0*(xmami)
-          lowmax = xval - 0.01d0*(xmami)
-          uppmin = xval + 0.01d0*(xmami)
-          uppmax = xval + 10.0d0*(xmami)
-          low = max(low,lowmin)
-          low = min(low,lowmax)
-          upp = min(upp,uppmax)
-          upp = max(upp,uppmin)
-      end if
+        implicit none
+        integer, intent(inout)                                        :: n
+        integer, intent(inout)                                        :: outeriter
+        double precision, intent(inout)                               :: raa0
+        double precision, intent(inout)                               :: raa0eps                  
+        double precision, dimension(:,:), allocatable, intent(inout)  :: raa
+        double precision, dimension(:,:), allocatable, intent(inout)  :: raaeps
+        double precision, dimension(:,:), allocatable, intent(inout)  :: low
+        double precision, dimension(:,:), allocatable, intent(inout)  :: upp
+        double precision, dimension(:,:), allocatable, intent(inout)  :: xval
+        double precision, dimension(:,:), allocatable, intent(inout)  :: xold1
+        double precision, dimension(:,:), allocatable, intent(inout)  :: xold2
+        double precision, dimension(:,:), allocatable, intent(inout)  :: xmin
+        double precision, dimension(:,:), allocatable, intent(inout)  :: xmax
+        double precision, dimension(:,:), allocatable, intent(inout)  :: dfdx                      
+        double precision, dimension(:,:), allocatable, intent(inout)  :: df0dx                    
+        ! internal variables
+        double precision                                              :: asyinit
+        double precision                                              :: asyincr
+        double precision                                              :: asydecr
+        double precision, dimension(:,:), allocatable                 :: xmami
+        double precision, dimension(:,:), allocatable                 :: lowmin
+        double precision, dimension(:,:), allocatable                 :: lowmax
+        double precision, dimension(:,:), allocatable                 :: uppmin
+        double precision, dimension(:,:), allocatable                 :: uppmax
+        double precision, dimension(:,:), allocatable                 :: zzz
+        double precision, dimension(:,:), allocatable                 :: factor
+        double precision, dimension(:,:), allocatable                 :: eeen
+        double precision, dimension(:,:), allocatable                 :: xmamieps
+        eeen = ones(n,1)
+        xmami = xmax - xmin;
+        xmamieps = 0.00001d0*eeen
+        xmami = max(xmami,xmamieps)
+        raa0 = dot_product(abs(df0dx),xmami)
+        raa0 = maxval([raa0eps,(0.1d0/n)*raa0])
+        raa = matmul(abs(dfdx),xmami)
+        raa = max(raaeps,(0.1d0/n)*raa)
+        asyinit = 0.5d0
+        asyincr = 1.2d0
+        asydecr = 0.7d0
+        ! Calculation of the asymptotes low and upp
+        if (iter.lt.2.5) then
+            low = xval - asyinit*(xmami)
+            upp = xval + asyinit*(xmami)
+        else
+            zzz = (xval-xold1)*(xold1-xold2)
+            factor = eeen
+            where (zzz.gt.0.0d0)
+                factor = asyincr
+            elsewhere (zzz.lt.0.0d0)
+                factor = asydecr
+            end where
+            low = xval - factor*(xold1 - low)
+            upp = xval + factor*(upp - xold1)
+            lowmin = xval - 10.0d0*(xmami)
+            lowmax = xval - 0.01d0*(xmami)
+            uppmin = xval + 0.01d0*(xmami)
+            uppmax = xval + 10.0d0*(xmami)
+            low = max(low,lowmin)
+            low = min(low,lowmax)
+            upp = min(upp,uppmax)
+            upp = max(upp,uppmin)
+        end if
     end subroutine AsympDP
 
     ! raaUpdate (pendiente)
-    subroutine raaUpdateReal()
-      implicit none
-      
+    subroutine raaUpdateReal(raa0,raa,xmma,xval,xmin,xmax,low,upp,f0valnew,fvalnew, &
+                            f0app,fapp,raa0eps,raaeps,epsimin)
+        implicit none
+        ! inout
+        real, intent(inout)                                          :: raa0
+        real, intent(inout)                                          :: raa0eps
+        real, intent(inout)                                          :: f0app
+        real, intent(inout)                                          :: f0valnew
+        real, intent(inout)                                          :: epsimin        
+        real, dimension(:,:), allocatable, intent(inout)             :: raa
+        real, dimension(:,:), allocatable, intent(inout)             :: raaeps
+        real, dimension(:,:), allocatable, intent(inout)             :: xmma
+        real, dimension(:,:), allocatable, intent(inout)             :: xval
+        real, dimension(:,:), allocatable, intent(inout)             :: fapp
+        real, dimension(:,:), allocatable, intent(inout)             :: fvalnew
+        real, dimension(:,:), allocatable, intent(inout)             :: low
+        real, dimension(:,:), allocatable, intent(inout)             :: upp
+        real, dimension(:,:), allocatable, intent(inout)             :: xmin
+        real, dimension(:,:), allocatable, intent(inout)             :: xmax
+        ! internal variables
+        integer                                                       :: m
+        integer                                                       :: n
+        real                                                          :: raacofmin
+        real                                                          :: f0appe
+        real                                                          :: zz0
+        real                                                          :: deltaraa0
+        real, dimension(:,:), allocatable                             :: zzz
+        real, dimension(:,:), allocatable                             :: eeem
+        real, dimension(:,:), allocatable                             :: eeen
+        real, dimension(:,:), allocatable                             :: xmami
+        real, dimension(:,:), allocatable                             :: xmamieps
+        real, dimension(:,:), allocatable                             :: xxux
+        real, dimension(:,:), allocatable                             :: xxxl
+        real, dimension(:,:), allocatable                             :: xxul
+        real, dimension(:,:), allocatable                             :: ulxx
+        real, dimension(:,:), allocatable                             :: raacof
+        real, dimension(:,:), allocatable                             :: fappe
+        real, dimension(:,:), allocatable                             :: fdelta
+        real, dimension(:,:), allocatable                             :: deltaraa
+        ! process
+        raacofmin = 1.0d-12
+        m = size(raa)
+        n = size(xmma)
+        eeem = ones(m,1)
+        eeen = ones(n,1)
+        xmami = xmax-xmin;
+        xmamieps = 0.00001d0*eeen
+        xmami = max(xmami,xmamieps)
+        !
+        xxux = (xmma-xval)/(upp-xmma)
+        xxxl = (xmma-xval)/(xmma-low)
+        xxul = xxux*xxxl
+        ulxx = (upp-low)/xmami
+        raacof = maxval(matmul(transpose(xxul),ulxx),raacofmin)
+        !
+        f0appe = f0app+0.5d0*epsimin;
+        if (f0valnew.gt.f0app) then
+            deltaraa0 = (1.0d0/raacof)*(f0valnew-f0app)
+            zz0 = 1.1d0*(raa0 + deltaraa0)
+            zz0 = min(zz0,10.0d0*raa0)
+            !zz0 = min(zz0,1000.0d0*raa0)
+            raa0 = zz0
+        end if 
+        !
+        fappe = fapp + 0.5d0*epsimin*eeem
+        fdelta = fvalnew-fappe
+        deltaraa = (1/raacof)*(fvalnew-fapp)
+        zzz = 1.1*(raa + deltaraa)
+        zzz = min(zzz,10.0d0*raa)
+        !zzz = min(zzz,1000.0d0*raa)
+        where (fdelta.gt.0.0d0)
+            raa = zzz
+        end where
     end subroutine raaUpdateReal
 
-    subroutine raaUpdateDP()
-      implicit none
-      
+    subroutine raaUpdateDP(raa0,raa,xmma,xval,xmin,xmax,low,upp,f0valnew,fvalnew, &
+                            f0app,fapp,raa0eps,raaeps,epsimin)
+        implicit none
+        ! inout
+        double precision, intent(inout)                               :: raa0
+        double precision, intent(inout)                               :: raa0eps
+        double precision, intent(inout)                               :: f0app
+        double precision, intent(inout)                               :: f0valnew
+        double precision, intent(inout)                               :: epsimin        
+        double precision, dimension(:,:), allocatable, intent(inout)  :: raa
+        double precision, dimension(:,:), allocatable, intent(inout)  :: raaeps
+        double precision, dimension(:,:), allocatable, intent(inout)  :: xmma
+        double precision, dimension(:,:), allocatable, intent(inout)  :: xval
+        double precision, dimension(:,:), allocatable, intent(inout)  :: fapp
+        double precision, dimension(:,:), allocatable, intent(inout)  :: fvalnew
+        double precision, dimension(:,:), allocatable, intent(inout)  :: low
+        double precision, dimension(:,:), allocatable, intent(inout)  :: upp
+        double precision, dimension(:,:), allocatable, intent(inout)  :: xmin
+        double precision, dimension(:,:), allocatable, intent(inout)  :: xmax
+        ! internal variables
+        integer                                                       :: m
+        integer                                                       :: n
+        double precision                                              :: raacofmin
+        double precision                                              :: f0appe
+        double precision                                              :: zz0
+        double precision                                              :: deltaraa0
+        double precision, dimension(:,:), allocatable                 :: zzz
+        double precision, dimension(:,:), allocatable                 :: eeem
+        double precision, dimension(:,:), allocatable                 :: eeen
+        double precision, dimension(:,:), allocatable                 :: xmami
+        double precision, dimension(:,:), allocatable                 :: xmamieps
+        double precision, dimension(:,:), allocatable                 :: xxux
+        double precision, dimension(:,:), allocatable                 :: xxxl
+        double precision, dimension(:,:), allocatable                 :: xxul
+        double precision, dimension(:,:), allocatable                 :: ulxx
+        double precision, dimension(:,:), allocatable                 :: raacof
+        double precision, dimension(:,:), allocatable                 :: fappe
+        double precision, dimension(:,:), allocatable                 :: fdelta
+        double precision, dimension(:,:), allocatable                 :: deltaraa
+        ! process
+        raacofmin = 1.0d-12
+        m = size(raa)
+        n = size(xmma)
+        eeem = ones(m,1)
+        eeen = ones(n,1)
+        xmami = xmax-xmin;
+        xmamieps = 0.00001d0*eeen
+        xmami = max(xmami,xmamieps)
+        !
+        xxux = (xmma-xval)/(upp-xmma)
+        xxxl = (xmma-xval)/(xmma-low)
+        xxul = xxux*xxxl
+        ulxx = (upp-low)/xmami
+        raacof = maxval(matmul(transpose(xxul),ulxx),raacofmin)
+        !
+        f0appe = f0app+0.5d0*epsimin;
+        if (f0valnew.gt.f0app) then
+            deltaraa0 = (1.0d0/raacof)*(f0valnew-f0app)
+            zz0 = 1.1d0*(raa0 + deltaraa0)
+            zz0 = min(zz0,10.0d0*raa0)
+            !zz0 = min(zz0,1000.0d0*raa0)
+            raa0 = zz0
+        end if 
+        !
+        fappe = fapp + 0.5d0*epsimin*eeem
+        fdelta = fvalnew-fappe
+        deltaraa = (1/raacof)*(fvalnew-fapp)
+        zzz = 1.1*(raa + deltaraa)
+        zzz = min(zzz,10.0d0*raa)
+        !zzz = min(zzz,1000.0d0*raa)
+        where (fdelta.gt.0.0d0)
+            raa = zzz
+        end where
     end subroutine raaUpdateDP
 
     ! Solver for [A]{x}={B}
